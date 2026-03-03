@@ -44,7 +44,7 @@ public class PortfolioService(ILogger<PortfolioService> logger,
 
     }
 
-    public async Task<IEnumerable<PortfolioSummaryDto>> GetUserPortfoliosAsync()
+    public async Task<IEnumerable<PortfolioSummaryDto>> GetUserPortfoliosAsync()q
     {
         logger.LogInformation("Getting portfolios for {@CurrentUser}", currentUser.userId);
         var userPortfolios = await portfolioRepository.GetAllByUserIdAsync(currentUser.userId)
