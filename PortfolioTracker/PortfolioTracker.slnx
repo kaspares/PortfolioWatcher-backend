@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../PortfolioTracker.Application/PortfolioTracker.Application.csproj" />
+  <Project Path="../PortfolioTracker.Domain/PortfolioTracker.Domain.csproj" />
+  <Project Path="../PortfolioTracker.Infrastructure/PortfolioTracker.Infrastructure.csproj" />
+  <Project Path="PortfolioTracker.API.csproj" />
+</Solution>
