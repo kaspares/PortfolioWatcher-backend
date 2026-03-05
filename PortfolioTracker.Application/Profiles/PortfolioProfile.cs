@@ -16,8 +16,6 @@ namespace PortfolioTracker.Application.Profiles
 
             CreateMap<Portfolio, PortfolioDetailDto>();
             CreateMap<Portfolio, PortfolioDetailDto>();
-            CreateMap<PortfolioItem, PortfolioItemDto>();
-            CreateMap<PositionComment, ItemCommentDto>();
             CreateMap<CreatePortfolioDto, Portfolio>();
             CreateMap<UpdatePortfolioDto, Portfolio>();
 

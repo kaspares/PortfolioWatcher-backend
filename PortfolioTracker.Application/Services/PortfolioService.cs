@@ -44,7 +44,7 @@ public class PortfolioService(ILogger<PortfolioService> logger,
 
     }
 
-    public async Task<IEnumerable<PortfolioSummaryDto>> GetUserPortfoliosAsync()q
+    public async Task<IEnumerable<PortfolioSummaryDto>> GetUserPortfoliosAsync()
     {
         logger.LogInformation("Getting portfolios for {@CurrentUser}", currentUser.userId);
         var userPortfolios = await portfolioRepository.GetAllByUserIdAsync(currentUser.userId)
@@ -60,8 +60,7 @@ public class PortfolioService(ILogger<PortfolioService> logger,
 
         var portfolio = mapper.Map<Portfolio>(portfolioDto);
 
-
-        mapper.Map(portfolioDto, portfolio);
+        mapper.Map(dto, portfolio);
         await portfolioRepository.UpdateAsync(portfolio);
     }
 }
