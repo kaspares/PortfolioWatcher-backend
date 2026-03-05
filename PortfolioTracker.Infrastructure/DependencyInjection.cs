@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PortfolioTracker.Domain.Interfaces;
 using PortfolioTracker.Domain.Repositories;
 using PortfolioTracker.Infrastructure.Identity;
 using PortfolioTracker.Infrastructure.Persistence;
@@ -50,6 +51,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+        services.AddScoped<IPortfolioItemRepository, PortfolioItemRepository>();
 
         return services;
     }

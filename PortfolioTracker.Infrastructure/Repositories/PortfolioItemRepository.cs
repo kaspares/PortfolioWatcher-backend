@@ -19,6 +19,14 @@ namespace PortfolioTracker.Infrastructure.Repositories
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task<IEnumerable<PortfolioItem>> GetAllPortfolioItemInPortfolio(Guid id)
+        {
+            return await dbContext.PortfolioItems
+                .Include(p => p.Comments)
+                .Where(p => p.PortfolioId == id)
+                .ToListAsync();
+        }
+
         public async Task<PortfolioItem?> GetPortfolioItemByIdAsync(Guid id)
         {
             return await dbContext.PortfolioItems.FirstOrDefaultAsync(pi => pi.Id == id);
