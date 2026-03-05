@@ -10,9 +10,11 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IPortfolioService, PortfolioService>();
+        services.AddScoped<IPortfolioItemService, PortfolioItemService>();
         services.AddAutoMapper(cfg =>
         {
             cfg.AddMaps(typeof(PortfolioProfile).Assembly);
+            cfg.AddMaps(typeof(PortfolioItemProfile).Assembly);
         });
         return services;
     }
