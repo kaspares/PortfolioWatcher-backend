@@ -12,6 +12,8 @@ public class PortfolioItemProfile : Profile
         CreateMap<PositionComment, ItemCommentDto>();
         CreateMap<PortfolioItemDto, PortfolioItem>();
         CreateMap<CreatePortfolioItemDto, PortfolioItem>();
+        CreateMap<ItemCommentDto, PositionComment>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
         CreateMap<UpdatePortfolioItemDto, PortfolioItem>();
     }
 }
