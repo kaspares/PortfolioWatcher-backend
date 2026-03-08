@@ -25,9 +25,8 @@ public class PortfolioService(ILogger<PortfolioService> logger,
     public async Task DeleteAsync(Guid id)
     {
         logger.LogInformation("Deleting portfolio with id: {@Id}", id);
-        var portfolioDto = await GetByIdWithItemsAsync(id);
-        
-        var portfolio = mapper.Map<Portfolio>(portfolioDto);
+        var portfolio = await portfolioRepository.GetByIdAsync(id)
+            ?? throw new Exception("Portfolio not found");
 
         await portfolioRepository.DeleteAsync(portfolio);
     }
