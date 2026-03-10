@@ -1,5 +1,5 @@
-using Microsoft.OpenApi;
 using PortfolioTracker;
+using PortfolioTracker.API.Middlewares;
 using PortfolioTracker.Application;
 using PortfolioTracker.Application.Interfaces;
 using PortfolioTracker.Infrastructure;
@@ -30,6 +30,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
