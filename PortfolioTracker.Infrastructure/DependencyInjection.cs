@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PortfolioTracker.Domain.Interfaces;
 using PortfolioTracker.Domain.Repositories;
 using PortfolioTracker.Infrastructure.Identity;
+using PortfolioTracker.Infrastructure.MarketData;
 using PortfolioTracker.Infrastructure.Persistence;
 using PortfolioTracker.Infrastructure.Repositories;
 
@@ -52,6 +53,11 @@ public static class DependencyInjection
 
         services.AddScoped<IPortfolioRepository, PortfolioRepository>();
         services.AddScoped<IPortfolioItemRepository, PortfolioItemRepository>();
+        services.AddHttpClient<IMarketDataProvider, YahooFinanceProvider>(client =>
+        {
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
+        });
+
 
         return services;
     }

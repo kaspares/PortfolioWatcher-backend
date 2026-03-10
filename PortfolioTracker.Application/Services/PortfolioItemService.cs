@@ -15,8 +15,27 @@ namespace PortfolioTracker.Application.Services
         IMapper mapper,
         IPortfolioItemRepository portfolioItemRepository,
         IPortfolioRepository portfolioRepository,
-        ICurrentUserService currentUser) : IPortfolioItemService
+        ICurrentUserService currentUser,
+        IMarketDataProvider marketDataProvider) : IPortfolioItemService
     {
+
+        private async Task EnrichItemWithMarketDataAsync(PortfolioItemDto item)
+        {
+            try
+            {
+                var price = await marketDataProvider.GetCurrentPriceAsync(item.Ticker);
+                item.CurrentPrice = price;
+                item.MarketValue = item.Quantity * price;
+                var cost = item.Quantity * item.PurchasePrice;
+                item.ProfitLoss = item.MarketValue - cost;
+                item.ProfitLossPercent = cost != 0 ? Math.Round(item.ProfitLoss.Value / cost * 100, 2) : 0;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch price for {Ticker}", item.Ticker);
+            }
+        }
+
         private async Task GetAuhtorizedAsync(Guid portfolioId)
         {
             var portfolio = await portfolioRepository.GetByIdAsync(portfolioId)
@@ -68,7 +87,9 @@ namespace PortfolioTracker.Application.Services
             var portfolioItem = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId)
                 ?? throw new NotImplementedException("Portfolio item not found");
 
-            return mapper.Map<PortfolioItemDto>(portfolioItem);
+            var dto = mapper.Map<PortfolioItemDto>(portfolioItem);
+            await EnrichItemWithMarketDataAsync(dto);
+            return dto;
         }
 
         public async Task UpdateAsync(UpdatePortfolioItemDto dto, Guid portfolioItem, Guid portfolioItemId)

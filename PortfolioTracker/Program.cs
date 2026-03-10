@@ -14,6 +14,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddApplication();
 builder.Services.AddSwaggerGen();
 

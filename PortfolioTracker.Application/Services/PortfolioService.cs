@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using PortfolioTracker.Application.DTOs;
 using PortfolioTracker.Application.Interfaces;
 using PortfolioTracker.Domain.Entities;
+using PortfolioTracker.Domain.Interfaces;
 using PortfolioTracker.Domain.Repositories;
 
 namespace PortfolioTracker.Application.Services;
@@ -10,8 +11,44 @@ namespace PortfolioTracker.Application.Services;
 public class PortfolioService(ILogger<PortfolioService> logger,
     IMapper mapper,
     IPortfolioRepository portfolioRepository,
-    ICurrentUserService currentUser) : IPortfolioService
+    ICurrentUserService currentUser,
+    IMarketDataProvider marketDataProvider) : IPortfolioService
 {
+    private async Task EnrichWithMarketDataAsync(PortfolioDetailDto dto)
+    {
+        var tickers = dto.Items.Select(i => i.Ticker).Distinct();
+        var prices = new Dictionary<string, decimal>();
+
+        foreach (var ticker in tickers)
+        {
+            try
+            {
+                prices[ticker] = await marketDataProvider.GetCurrentPriceAsync(ticker);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to fetch price for {Ticker}", ticker);
+            }
+        }
+
+        foreach (var item in dto.Items)
+        {
+            if (!prices.TryGetValue(item.Ticker, out var price)) continue;
+
+            item.CurrentPrice = price;
+            item.MarketValue = item.Quantity * price;
+            var cost = item.Quantity * item.PurchasePrice;
+            item.ProfitLoss = item.MarketValue - cost;
+            item.ProfitLossPercent = cost != 0 ? Math.Round(item.ProfitLoss.Value / cost * 100, 2) : 0;
+        }
+
+        dto.TotalValue = dto.Items.Sum(i => i.MarketValue ?? 0);
+        dto.TotalCost = dto.Items.Sum(i => i.Quantity * i.PurchasePrice);
+        dto.TotalProfitLoss = dto.TotalValue - dto.TotalCost;
+        dto.TotalProfitLossPercent = dto.TotalCost != 0
+            ? Math.Round(dto.TotalProfitLoss.Value / dto.TotalCost.Value * 100, 2) : 0;
+    }
+
     public async Task CreateAsync(CreatePortfolioDto dto)
     {
         logger.LogInformation("Creating new portfolio: {@Portfolio}", dto);
@@ -39,8 +76,9 @@ public class PortfolioService(ILogger<PortfolioService> logger,
         if (portfolio.UserId != currentUser.userId)
             throw new NotImplementedException("Forbidden");
 
-        return mapper.Map<PortfolioDetailDto>(portfolio);
-
+        var dto = mapper.Map<PortfolioDetailDto>(portfolio);
+        await EnrichWithMarketDataAsync(dto);
+        return dto;
     }
 
     public async Task<IEnumerable<PortfolioSummaryDto>> GetUserPortfoliosAsync()
