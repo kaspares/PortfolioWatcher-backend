@@ -37,21 +37,19 @@ namespace PortfolioTracker.Application.Services
             }
         }
 
-        private async Task GetAuhtorizedAsync(Guid portfolioId)
+        private async Task GetAuthorizedAsync(Guid portfolioId)
         {
             var portfolio = await portfolioRepository.GetByIdAsync(portfolioId)
               ?? throw new NotImplementedException("Portfolio not found");
 
             if (portfolio.UserId != currentUser.userId)
                 throw new NotImplementedException("Forbidden");
-
-            return;
         }
         public async Task CreateAsync(CreatePortfolioItemDto dto, Guid portfolioId)
         {
-            logger.LogInformation("Creating new portfolio item {@dto} in portfolio with id: {@PortfolioId}", dto, portfolioId);
+            logger.LogInformation("Creating new portfolio item {@Dto} in portfolio with id: {@PortfolioId}", dto, portfolioId);
             
-            await GetAuhtorizedAsync(portfolioId);
+            await GetAuthorizedAsync(portfolioId);
 
             var portfolioItem = mapper.Map<PortfolioItem>(dto);
             portfolioItem.PortfolioId = portfolioId;
@@ -62,19 +60,19 @@ namespace PortfolioTracker.Application.Services
 
         public async Task DeleteAsync(Guid portfolioId, Guid portfolioItemId)
         {
-            logger.LogInformation("Deleting portfolio with id: {@portfolioId}", portfolioId);
-            await GetAuhtorizedAsync(portfolioId);
+            logger.LogInformation("Deleting portfolioItem with id: {@PortfolioItemId}", portfolioItemId);
+            await GetAuthorizedAsync(portfolioId);
 
-            var portfolio = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId) 
+            var portfolioItem = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId) 
                 ?? throw new NotFoundException(nameof(PortfolioItem), portfolioItemId.ToString());
 
-            await portfolioItemRepository.DeleteAsync(portfolio);
+            await portfolioItemRepository.DeleteAsync(portfolioItem);
         }
 
         public async Task<IEnumerable<PortfolioItemDto>> GetAllByPortfolio(Guid portfolioId)
         {
-            logger.LogInformation("Getting all portfolioItems for portfolio with id: {@portfolioId}", portfolioId);
-            await GetAuhtorizedAsync(portfolioId);
+            logger.LogInformation("Getting all portfolioItems for portfolio with id: {@PortfolioId}", portfolioId);
+            await GetAuthorizedAsync(portfolioId);
             var portfolios = await portfolioItemRepository.GetAllPortfolioItemInPortfolio(portfolioId);
 
             return mapper.Map<IEnumerable<PortfolioItemDto>>(portfolios);
@@ -83,8 +81,8 @@ namespace PortfolioTracker.Application.Services
 
         public async Task<PortfolioItemDto> GetByIdAsync(Guid portfolioId, Guid portfolioItemId)
         {
-            logger.LogInformation("Getting portfolioItem with id: {@id}", portfolioItemId);
-            await GetAuhtorizedAsync(portfolioId);
+            logger.LogInformation("Getting portfolioItem with id: {@PortfolioItemId}", portfolioItemId);
+            await GetAuthorizedAsync(portfolioId);
             var portfolioItem = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId)
                 ?? throw new NotFoundException(nameof(PortfolioItem), portfolioItemId.ToString());
 
@@ -95,8 +93,8 @@ namespace PortfolioTracker.Application.Services
 
         public async Task UpdateAsync(UpdatePortfolioItemDto dto, Guid portfolioItem, Guid portfolioItemId)
         {
-            logger.LogInformation("Updating portfolioItem");
-            await GetAuhtorizedAsync(portfolioItem);
+            logger.LogInformation("Updating portfolioItem with id: {@PortfolioItemId}", portfolioItemId);
+            await GetAuthorizedAsync(portfolioItem);
 
             var oldPortfolio = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId)
                 ?? throw new NotFoundException(nameof(PortfolioItem), portfolioItemId.ToString());
