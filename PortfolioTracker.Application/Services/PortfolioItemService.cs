@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using PortfolioTracker.Application.DTOs;
+using PortfolioTracker.Application.Exceptions;
 using PortfolioTracker.Application.Interfaces;
 using PortfolioTracker.Domain.Entities;
 using PortfolioTracker.Domain.Interfaces;
@@ -65,7 +66,7 @@ namespace PortfolioTracker.Application.Services
             await GetAuhtorizedAsync(portfolioId);
 
             var portfolio = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId) 
-                ?? throw new NotImplementedException("PortfolioItem not found");
+                ?? throw new NotFoundException(nameof(PortfolioItem), portfolioItemId.ToString());
 
             await portfolioItemRepository.DeleteAsync(portfolio);
         }
@@ -85,7 +86,7 @@ namespace PortfolioTracker.Application.Services
             logger.LogInformation("Getting portfolioItem with id: {@id}", portfolioItemId);
             await GetAuhtorizedAsync(portfolioId);
             var portfolioItem = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId)
-                ?? throw new NotImplementedException("Portfolio item not found");
+                ?? throw new NotFoundException(nameof(PortfolioItem), portfolioItemId.ToString());
 
             var dto = mapper.Map<PortfolioItemDto>(portfolioItem);
             await EnrichItemWithMarketDataAsync(dto);
@@ -97,8 +98,8 @@ namespace PortfolioTracker.Application.Services
             logger.LogInformation("Updating portfolioItem");
             await GetAuhtorizedAsync(portfolioItem);
 
-            var oldPortfolio = await portfolioRepository.GetByIdAsync(portfolioItemId)
-                ?? throw new NotImplementedException("Not found");
+            var oldPortfolio = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId)
+                ?? throw new NotFoundException(nameof(PortfolioItem), portfolioItemId.ToString());
 
             mapper.Map(dto, oldPortfolio);
             await portfolioItemRepository.UpdateAsync();

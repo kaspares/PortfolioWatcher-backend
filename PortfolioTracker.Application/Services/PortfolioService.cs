@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using PortfolioTracker.Application.DTOs;
+using PortfolioTracker.Application.Exceptions;
 using PortfolioTracker.Application.Interfaces;
 using PortfolioTracker.Domain.Entities;
 using PortfolioTracker.Domain.Interfaces;
@@ -63,7 +64,7 @@ public class PortfolioService(ILogger<PortfolioService> logger,
     {
         logger.LogInformation("Deleting portfolio with id: {@Id}", id);
         var portfolio = await portfolioRepository.GetByIdAsync(id)
-            ?? throw new Exception("Portfolio not found");
+            ?? throw new NotFoundException(nameof(Portfolio), id.ToString());
 
         await portfolioRepository.DeleteAsync(portfolio);
     }
@@ -72,7 +73,7 @@ public class PortfolioService(ILogger<PortfolioService> logger,
     {
         logger.LogInformation("Getting portfolio with id: {@Id}", id);
         var portfolio = await portfolioRepository.GetByIdWithItemsAsync(id)
-            ?? throw new NotImplementedException("Not found");
+            ?? throw new NotFoundException(nameof(Portfolio), id.ToString());
         if (portfolio.UserId != currentUser.userId)
             throw new NotImplementedException("Forbidden");
 
@@ -85,17 +86,16 @@ public class PortfolioService(ILogger<PortfolioService> logger,
     {
         logger.LogInformation("Getting portfolios for {@CurrentUser}", currentUser.userId);
         var userPortfolios = await portfolioRepository.GetAllByUserIdAsync(currentUser.userId)
-            ?? throw new NotImplementedException("Not found");
+            ?? throw new NotFoundException(nameof(Portfolio), currentUser.userId.ToString());
 
         return mapper.Map<IEnumerable<PortfolioSummaryDto>>(userPortfolios);
     }
 
     public async Task UpdateAsync(UpdatePortfolioDto dto, Guid id)
     {
-        logger.LogInformation("Deleting portfolio with id: {@Id}", id);
-        var portfolioDto = await GetByIdWithItemsAsync(id);
-
-        var portfolio = mapper.Map<Portfolio>(portfolioDto);
+        logger.LogInformation("Updating portfolio with id: {@Id}", id);
+        var portfolio = await portfolioRepository.GetByIdAsync(id)
+            ?? throw new NotFoundException(nameof(Portfolio), id.ToString());
 
         mapper.Map(dto, portfolio);
         await portfolioRepository.UpdateAsync(portfolio);
