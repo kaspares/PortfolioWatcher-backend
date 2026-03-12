@@ -100,4 +100,18 @@ public class PortfolioService(ILogger<PortfolioService> logger,
         mapper.Map(dto, portfolio);
         await portfolioRepository.UpdateAsync(portfolio);
     }
+
+    public async Task<DashboardDto> GetDashboardAsync(Guid portfolioId)
+    {
+        logger.LogInformation("Getting dashboard for portfolio with id: {@PortfolioId}", portfolioId);
+        var detail = await GetByIdWithItemsAsync(portfolioId);
+
+        return new DashboardDto
+        {
+            TotalValue = detail.TotalValue ?? 0,
+            TotalProfitLoss = detail.TotalProfitLoss ?? 0,
+            TotalProfitLossPercent = detail.TotalProfitLossPercent ?? 0,
+            TotalInstruments = detail.Items.Count
+        };
+    }
 }

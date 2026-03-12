@@ -10,6 +10,7 @@ namespace PortfolioTracker.Application.Interfaces
     {
         Task<IEnumerable<PortfolioSummaryDto>> GetUserPortfoliosAsync();
         Task<PortfolioDetailDto> GetByIdWithItemsAsync(Guid id);
+        Task<DashboardDto> GetDashboardAsync(Guid portfolioId);
         Task CreateAsync(CreatePortfolioDto portfolio);
         Task UpdateAsync(UpdatePortfolioDto portfolio, Guid id);
         Task DeleteAsync(Guid id);

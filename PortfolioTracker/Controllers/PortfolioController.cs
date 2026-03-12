@@ -19,10 +19,17 @@ namespace PortfolioTracker.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PortfolioDetailDto>> GetByIdWithItems(Guid id)
+        [HttpGet("{portfolioId}")]
+        public async Task<ActionResult<PortfolioDetailDto>> GetByIdWithItems(Guid portfolioId)
         {
-            var result = await portfolioService.GetByIdWithItemsAsync(id);
+            var result = await portfolioService.GetByIdWithItemsAsync(portfolioId);
+            return Ok(result);
+        }
+
+        [HttpGet("{portfolioId}/dashboard")]
+        public async Task<ActionResult<IEnumerable<PortfolioSummaryDto>>> GetDashboardById(Guid portfolioId)
+        {
+            var result = await portfolioService.GetDashboardAsync(portfolioId);
             return Ok(result);
         }
 
@@ -34,18 +41,18 @@ namespace PortfolioTracker.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(UpdatePortfolioDto portfolio, Guid id)
+        [HttpPut("{portfolioId}")]
+        public async Task<IActionResult> Update(UpdatePortfolioDto portfolio, Guid portfolioId)
         {
-            await portfolioService.UpdateAsync(portfolio, id);
+            await portfolioService.UpdateAsync(portfolio, portfolioId);
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpDelete("{portfolioId}")]
+        public async Task<IActionResult> Delete(Guid portfolioId)
         {
-            await portfolioService.DeleteAsync(id);
+            await portfolioService.DeleteAsync(portfolioId);
 
             return NoContent();
         }
