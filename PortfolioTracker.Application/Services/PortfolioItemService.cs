@@ -64,7 +64,7 @@ namespace PortfolioTracker.Application.Services
             logger.LogInformation("Deleting portfolio with id: {@portfolioId}", portfolioId);
             await GetAuhtorizedAsync(portfolioId);
 
-            var portfolio = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioId) 
+            var portfolio = await portfolioItemRepository.GetPortfolioItemByIdAsync(portfolioItemId) 
                 ?? throw new NotImplementedException("PortfolioItem not found");
 
             await portfolioItemRepository.DeleteAsync(portfolio);
